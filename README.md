@@ -58,4 +58,53 @@ Our entry and exit rules
 
 come directly from the **empirical research tradition in mean-reversion strategies**, where signals are normalised (usually via z-scores) and trades are triggered when deviations reach statistically meaningful levels.
 
-Across academic
+Across academic and practitioner studies on spreads, pairs trading, curve arbitrage and OU-based strategies, typical entry thresholds lie around **1.5–2.0 standard deviations**.  
+Examples include:
+
+- Gatev, Goetzmann & Rouwenhorst (2006) — pairs-trading thresholds around 1.5–2σ.  
+- Elliott, Van der Hoek & Malcolm (2005) — OU-based mean-reversion optimal stopping regions often in the 1.5σ+ range.  
+- General stat-arb practice (e.g., Z-score–based spread trades in fixed income) frequently uses 1.5–2σ for entries and tighter bands for exits.
+
+Our chosen values fall squarely within this well-established range and balance signal strength against trading frequency and transaction costs.  
+Given our multi-country setup and futures/bond execution costs, 1.6σ entry with a tighter 0.2σ reversal exit produced the strongest net performance in backtesting.
+
+---
+
+## Bloomberg Data Constraints
+
+Futures data was successfully downloaded for all liquid markets  
+(US TU/FV/TY/US; Germany Schatz/Bobl/Bund/Buxl; UK gilt futures).
+
+However, **full benchmark bond histories** for seven sovereigns could not be pulled due to:
+
+- Daily and monthly Bloomberg **download quotas** on the Columbia Uris Library terminal,  
+- Limited access to deep history for older bond lines and swap tenors,  
+- Not enough remaining quota to extract complete multi-country bond datasets.
+
+Because of this, zero curves are used as the primary modelling object until the quota resets at month-end.
+
+---
+
+## Future Work
+
+Once Bloomberg limits reset, we will extract:
+
+- Full benchmark 2y/5y/10y/30y bond histories for all sovereigns,  
+- CTD-adjusted DV01s for futures,  
+- Extended swap-curve histories,  
+- Country-specific transaction-cost structures.
+
+This will allow us to provide both:
+
+1. **Theoretical curve P&L** (zero-curve based), and  
+2. **Full realised P&L** from actual bond price movements.
+
+---
+
+## References
+
+- Brigo, D. & Mercurio, F. (2006). *Interest Rate Models: Theory and Practice*. Springer.  
+- Andersen, L. & Piterbarg, V. (2010). *Interest Rate Modelling*, Volume I. Atlantic Financial Press.  
+- Hull, J. (2018). *Options, Futures and Other Derivatives* (10th ed.). Pearson.  
+- Gatev, E., Goetzmann, W., & Rouwenhorst, K. (2006). *Pairs Trading: Performance of a Relative-Value Arbitrage Rule*.  
+- Elliott, R., Van der Hoek, J., & Malcolm, W. (2005). *Pairs Trading*.  
