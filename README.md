@@ -26,18 +26,25 @@ These texts form the basis for modern desk methodology and justify our use of ze
 
 When full benchmark government bond data (2y/5y/10y/30y) is available, realised PnL will be computed exactly as done on fixed-income desks:
 
-- **Fix trade notionals** \( N_i \) at entry using DV01-neutral weights:  
-  `sum_i ( N_i * DV01_i ) = 0`
+- **Fix trade notionals (N_i) at entry using DV01-neutral weights:**
 
-- **Daily realised / MTM PnL** using dirty closing prices:  
-  `PnL_t = sum_i [ N_i * (P_{i,t} - P_{i,t-1}) ]  
-           + sum_i [ N_i * Coupon_{i,t} ]  
-           - TC_t`
+      sum_i [ N_i * DV01_i ] = 0
 
-- **FX conversion** for non-USD sovereigns:  
-  `PnL_USD_t = PnL_local_t * FX_t`
+- **Daily realised / MTM PnL using *dirty close prices* (which include accrued interest):**
+
+      PnL_t = sum_i [ N_i * ( P_{i,t} - P_{i,t-1} ) ]
+              + sum_i [ N_i * Coupon_{i,t} ]
+              - TC_t
+
+  - Dirty close prices ensure that coupon accrual is captured naturally in daily PnL.
+  - Explicit coupon cashflows (Coupon_{i,t}) are added on coupon payment dates.
+
+- **FX conversion for non-USD sovereigns:**
+
+      PnL_USD_t = PnL_local_t * FX_t
 
 This produces executable, bond-level realised PnL suitable for comparison with the zero-curve theoretical PnL.
+
 
 ---
 
