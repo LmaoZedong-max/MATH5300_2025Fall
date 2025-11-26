@@ -3,71 +3,67 @@
 
 ## Data & Methodology Note — Zero-Coupon Curves and Bloomberg Limits
 
-Our implementation of yield-curve flies, CRD signals, and DV01-neutral portfolio construction uses **zero-coupon curves** rather than direct coupon-bond prices. This follows standard practice on fixed-income desks, where theo-PnL, curve risk, and DV01 attribution are computed relative to the **zero-coupon discount curve**.
+Our implementation of yield-curve flies, CRD signals, and DV01-neutral portfolio construction uses **zero-coupon curves** rather than direct coupon-bond prices. This approach follows established practice in fixed-income modelling, where theo-PnL, rate risk, DV01 and curve-shape analysis are defined relative to the **zero-coupon term structure**.
 
-### Why zero-coupon curves? (Industry-standard, with explicit sources)
+### Why zero-coupon curves? (Industry-standard foundations)
 
-- **Brigo & Mercurio (2006), *Interest Rate Models: Theory and Practice*, Ch. 2**  
-  > “Market practice is to derive the zero-coupon curve from traded instruments and compute all sensitivities and PnL with respect to this curve.”
+The foundational literature in interest-rate modelling consistently emphasises that:
 
-- **Andersen & Piterbarg (2010), *Interest Rate Modelling*, Vol. 1, Ch. 3**  
-  > “Risk reports and PnL attribution are always produced relative to the discount curve… Zero rates form the basis of all curve-consistent sensitivity measures.”
+- Pricing, hedging, and sensitivity computations for fixed-income instruments are performed with respect to the **zero-coupon discount curve**, not directly from coupon-bond prices.
+- Zero curves provide the **arbitrage-free, maturity-consistent** representation of the term structure used for DV01, bucket risk, carry, and roll-down.
+- Curve trades (including flies) are economically defined via **changes in zero rates** rather than raw bond price moves.
 
-- **Hull (2018), *Options, Futures and Other Derivatives* (10th ed.), Ch. 7**  
-  > “The zero-coupon yield curve is the fundamental input for pricing and hedging interest-rate instruments.”
+This treatment is described in:
+- Brigo & Mercurio — *Interest Rate Models: Theory and Practice* (Ch. 1–2)  
+- Andersen & Piterbarg — *Interest Rate Modelling*, Vol. 1 (Ch. 3)  
+- Hull — *Options, Futures and Other Derivatives* (Ch. 7)
 
-These references make clear that our theo-PnL engine is aligned with professional interest-rate modelling standards.
+These texts form the basis for modern desk methodology and justify our use of zero-coupon curves for theoretical PnL.
 
 ---
 
 ## Realised PnL Using Actual Bond Prices (for future data refresh)
 
-When full benchmark government bond data (2y/5y/10y/30y) is available, realised PnL will be computed exactly as done on desks:
+When full benchmark government bond data (2y/5y/10y/30y) is available, realised PnL will be computed exactly as done on fixed-income desks:
 
-- **Fix trade notionals** \(N_i\) at entry using DV01-neutral weights:  
-  \[
-  \sum_i N_i \cdot \mathrm{DV01}_i = 0.
-  \]
+- **Fix trade notionals** \( N_i \) at entry using DV01-neutral weights:  
+  `sum_i ( N_i * DV01_i ) = 0`
 
-- **Daily realised/MTM PnL** is computed using dirty close prices:  
-  \[
-  \mathrm{PnL}_t = \sum_i N_i \big(P_{i,t} - P_{i,t-1}\big)
-  + \sum_i N_i \cdot \text{Coupon}_{i,t}
-  - \text{TC}_t.
-  \]
+- **Daily realised / MTM PnL** using dirty closing prices:  
+  `PnL_t = sum_i [ N_i * (P_{i,t} - P_{i,t-1}) ]  
+           + sum_i [ N_i * Coupon_{i,t} ]  
+           - TC_t`
 
-- For non-USD sovereigns:  
-  \[
-  \mathrm{PnL}^{USD}_t = \mathrm{PnL}^{local}_t \times FX_t.
-  \]
+- **FX conversion** for non-USD sovereigns:  
+  `PnL_USD_t = PnL_local_t * FX_t`
 
-This produces executable, bond-level realised PnL consistent with the zero-curve theoretical PnL.
+This produces executable, bond-level realised PnL suitable for comparison with the zero-curve theoretical PnL.
 
 ---
 
 ## Bloomberg Data Constraints
 
-We downloaded futures data for all liquid markets (US TU/FV/TY/US; Germany Schatz/Bobl/Bund/Buxl; UK gilt futures).  
-However, retrieving full historical benchmark bond prices and swap curves for seven sovereign markets was not feasible due to:
+We successfully downloaded futures data for liquid markets (US TU/FV/TY/US; Germany Schatz/Bobl/Bund/Buxl; UK gilt futures).  
+However, extracting full benchmark bond histories for all seven sovereign markets was not feasible due to:
 
-- Columbia Uris Library **Bloomberg daily & monthly data caps**,  
-- Limited access to older benchmark bonds and long-tenor swap histories,  
-- Insufficient bandwidth for full multi-country bond extraction within the project window.
+- Bloomberg **daily and monthly download caps** at Columbia Uris Library  
+- Limited access to historical benchmark bonds and older swap tenors  
+- Insufficient quota for full multi-country extraction within the project window
 
-Because of this, **zero-coupon curves are used for modelling**, matching the references above and real-world theo-PnL practice.
+Because of this, **zero-coupon curves serve as the primary modelling object**, which aligns with the references listed above and with standard theo-PnL practice on professional desks.
 
 ---
 
 ## Future Work
 
-Once Bloomberg query quotas reset at month-end, we will extract:
+Once Bloomberg quotas reset, we will extract:
 
-- Benchmark 2y/5y/10y/30y government bond prices,  
-- CTD-adjusted DV01s for futures,  
-- Full swap-curve histories,  
-- Country-specific transaction-cost surfaces.
+- Benchmark 2y/5y/10y/30y bond prices  
+- CTD-adjusted DV01s for all futures  
+- Complete swap-curve histories  
+- Country-specific transaction cost surfaces  
 
-This will allow the strategy to report both **theoretical** and fully **realised, bond-level PnL**.
+This will enable full **realised** (executable) PnL alongside the theoretical curve-PnL.
 
 ---
 
