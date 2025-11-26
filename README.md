@@ -1,83 +1,61 @@
 # MATH5300_2025Fall  
-### Hedge Fund Strategies & Risk:  Yield Curve Arbitrage
+### Hedge Fund Strategies & Risk — Yield Curve Arbitrage
 
-## Data & Methodology Note: Zero-Coupon Curves and Bloomberg Limits
+## Data & Methodology Note — Zero-Coupon Curves, Futures, and Bloomberg Limits
 
-In this project we build our flies, CRD signals and DV01-neutral portfolios off **zero-coupon curves**, not raw coupon-bond prices. That is broadly how fixed-income desks think about curve risk: theo PnL, DV01 and curve shape are all defined relative to the **zero-coupon term structure**, with the actual bonds or futures just used for execution.
+For now, our full curve-fly construction — CRD signals, z-score entries/exits, and DV01-neutral portfolio weights — is built off **zero-coupon curves**. This is the standard modelling framework in fixed-income, where theo-P&L, curve shape, carry/roll-down and DV01 are all defined relative to the **zero-coupon term structure**, not directly from raw bond prices.
 
-### Why zero-coupon curves?
+Previous versions of similar projects often used **benchmark bond prices directly**, but given our Bloomberg restrictions (see below), zero curves are the most reasonable and academically/industry-consistent proxy until the full dataset becomes available at the start of next month.
 
-The standard interest-rate texts all lean on zero curves as the basic object:
+### Why zero-coupon curves? (Industry-standard foundations)
 
-- Pricing, hedging and sensitivities are done off the **discount / zero curve**, rather than straight from bond prices.
-- Zero curves give an **arbitrage-free, maturity-consistent** view of the term structure, which is what you want for DV01 buckets, carry and roll-down.
-- Curve trades (including flies) are really trades in **changes in zero rates** across maturities, even if you put them on in bonds or futures.
+Across the core interest-rate literature (Brigo & Mercurio; Andersen & Piterbarg; Hull), the treatment is consistent:
 
-This is the treatment in:
-- Brigo & Mercurio — *Interest Rate Models: Theory and Practice* (Ch. 1–2)  
-- Andersen & Piterbarg — *Interest Rate Modelling*, Vol. 1 (Ch. 3)  
-- Hull — *Options, Futures and Other Derivatives* (Ch. 7)  
+- Pricing, hedging and risk attribution are carried out with respect to the **discount curve / zero curve** rather than coupon bonds.  
+- Zero curves give an **arbitrage-free, maturity-consistent** representation of the term structure — essential for DV01 buckets, carry, roll-down, and curvature.  
+- Curve trades (including flies) are economically trades in **relative zero-rate movements**, even if executed using coupon bonds or futures.
 
-So using zero curves for our theoretical curve PnL is very much in line with how people do this in practice.
+These sources form the baseline for modern fixed-income desk methodology and justify our use of zeros for theoretical curve-P&L.
 
 ---
 
-## Realised PnL Using Actual Bond Prices (for future data refresh)
+## Realised PnL Using Actual Bond Prices (to be added once data is pulled)
 
-Once we have full benchmark government bond data (2y/5y/10y/30y) for each country, we’ll back out **realised PnL** in the usual desk way:
+At the **beginning of next month**, once Bloomberg download quotas reset, we will pull the full benchmark government bond history (2y/5y/10y/30y) for all seven sovereigns.  
+That will allow us to compute **bond-level realised P&L**, matching what a live desk would see.
 
-- **Fix trade notionals \(N_i\) at entry using DV01-neutral weights**
+The realised P&L engine (already built) works as follows:
+
+- **Fix trade notionals \(N_i\)** at entry using DV01-neutral weights:
 
       sum_i [ N_i * DV01_i ] = 0
 
-- **Mark to dirty close each day**
+- **Daily realised / MTM PnL**, marked to *dirty close prices*:
 
       PnL_t = sum_i [ N_i * ( P_{i,t} - P_{i,t-1} ) ]
               + sum_i [ N_i * Coupon_{i,t} ]
               - TC_t
 
-  - We work with **dirty close prices**, so coupon accrual is naturally baked into the daily price move.
-  - Actual coupon cashflows `Coupon_{i,t}` are added on payment dates.
-  - `TC_t` collects bid–ask, fees and any other transaction costs.
+  - Dirty closes incorporate accrued interest naturally.  
+  - Explicit coupon cashflows `Coupon_{i,t}` are added on payment dates.  
+  - `TC_t` includes bid–ask and execution costs.  
 
-- **Convert non-USD legs back to USD**
+- **FX conversion** for non-USD sovereigns:
 
       PnL_USD_t = PnL_local_t * FX_t
 
-That gives us an executable, bond-level realised PnL that we can line up against the zero-curve theo PnL.
+Once the bond dataset is retrieved, this module will be activated to report **full realised P&L** alongside the theoretical curve P&L from zero curves.
+
+Until then, the zero-curve implementation is an appropriate and academically accepted proxy — and aligns directly with the theoretical foundation used by actual rates desks.
 
 ---
 
-## Bloomberg Data Constraints
+## Why our z-score entry/exit thresholds make sense (empirical mean-reversion practice)
 
-We’ve already pulled the futures history for the liquid contracts  
-(US TU/FV/TY/US; Germany Schatz/Bobl/Bund/Buxl; UK gilt futures).
+Our entry and exit rules  
+- `enter: |z| > 1.6`  
+- `exit: |z| < 0.2`  
 
-Pulling **full benchmark bond and swap histories** for all seven sovereigns, however, hit the limits of the Columbia Uris Library Bloomberg terminal:
+come directly from the **empirical research tradition in mean-reversion strategies**, where signals are normalised (usually via z-scores) and trades are triggered when deviations reach statistically meaningful levels.
 
-- Hard **daily and monthly download caps**,
-- Patchy access to older benchmark bonds and long-tenor swaps,
-- Not enough quota to grab every series we’d like across all countries.
-
-Because of that, the current version leans on **zero-coupon curves as the modelling object**, which still matches the way desks run theo curve PnL and risk.
-
----
-
-## Future Work
-
-When the Bloomberg quota resets, the plan is to:
-
-- Download benchmark 2y/5y/10y/30y bond prices for each sovereign,
-- Map futures via CTD-adjusted DV01s,
-- Fill out the swap-curve history,
-- Layer in more realistic, country-specific transaction-cost assumptions.
-
-At that point we can report both the **theoretical curve PnL** and the **fully realised, executable PnL** for the same strategy.
-
----
-
-## References
-
-- Brigo, D. & Mercurio, F. (2006). *Interest Rate Models: Theory and Practice*. Springer.  
-- Andersen, L. & Piterbarg, V. (2010). *Interest Rate Modelling*, Volume I. Atlantic Financial Press.  
-- Hull, J. (2018). *Options, Futures and Other Derivatives* (10th ed.). Pearson.
+Across academic
