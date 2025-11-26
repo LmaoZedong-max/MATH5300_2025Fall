@@ -68,4 +68,8 @@ That will let us generate both the zero-curve theoretical PnL and the full reali
 
 ## References
 
-- Brigo, D and Mercurio, F (2006). *Interest Rate Models: Theory and Practice*. S
+- Brigo, D and Mercurio, F (2006). *Interest Rate Models: Theory and Practice*. Springer.  
+- Andersen, L and Piterbarg, V (2010). *Interest Rate Modelling*, Volume I. Atlantic Financial Press.  
+- Hull, J (2018). *Options, Futures and Other Derivatives*, 10th ed. Pearson.  
+- Gatev, E; Goetzmann, W; Rouwenhorst, K (2006). *Pairs Trading: Performance of a Relative-Value Arbitrage Rule*.  
+- Elliott, R; Van der Hoek, J; Malcolm, W (2005). *Pairs Trading*.  
