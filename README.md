@@ -95,17 +95,3 @@ That will let us generate both the zero-curve theoretical PnL and the full reali
 
 ---
 
-## References
-
-- Andersen, L and Piterbarg, V (2010). *Interest Rate Modelling*, Volume I. Atlantic Financial Press.  
-- Avellaneda, M and Lee, J-H (2010). ‘Statistical Arbitrage in the U.S. Equities Market’, *Quantitative Finance*, 10(7), 761–782. :contentReference[oaicite:11]{index=11}  
-- Brigo, D and Mercurio, F (2006). *Interest Rate Models: Theory and Practice*. Springer.  
-- Elliott, R; Van der Hoek, J; Malcolm, W (2005). ‘Pairs Trading’, working paper. :contentReference[oaicite:12]{index=12}  
-- Gatev, E; Goetzmann, W; Rouwenhorst, K (2006). ‘Pairs Trading: Performance of a Relative-Value Arbitrage Rule’, *Review of Financial Studies*, 19(3), 797–827. :contentReference[oaicite:13]{index=13}  
-- Hull, J (2018). *Options, Futures and Other Derivatives*, 10th ed. Pearson.  
-- Palomar, D P (2024). ‘Trading the Spread’, in *Portfolio Optimization* (online bookdown). :contentReference[oaicite:14]{index=14}  
-- Tokat, E et al. (2022). ‘Pairs trading: is it applicable to exchange-traded funds?’, *Journal of Commodity Markets*. :contentReference[oaicite:15]{index=15}  
-- Vidyamurthy, G (2004). *Pairs Trading: Quantitative Methods and Analysis*. Wiley. :contentReference[oaicite:16]{index=16}  
-- QuantInsti (2022). ‘Pairs Trading for Beginners: Correlation, Cointegration, Z-score’. :contentReference[oaicite:17]{index=17}  
-- Investopedia (n.d.). ‘What Is Mean Reversion, and How Do Investors Use It?’. :contentReference[oaicite:18]{index=18}  
-- Stübinger, J (2017). ‘Statistical Arbitrage Pairs Trading with High-frequency Data’, *International Journal of Economics and Financial Issues*. :contentReference[oaicite:19]{index=19}
